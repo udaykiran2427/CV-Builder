@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import GeneralInfo from "./components/GeneralInfo";
 import Education from "./components/Education";
 import Experience from "./components/Experience";
@@ -6,6 +6,7 @@ import Projects from "./components/Projects";
 import Skills from "./components/Skills";
 import "./App.css";
 import "./index.css";
+
 function App() {
   const [generalInfo, setGeneralInfo] = useState({
     name: "",
@@ -20,12 +21,14 @@ function App() {
       year: "",
     },
   ]);
+
   const [skills, setSkills] = useState([
     {
       type: "",
       list: "",
     },
   ]);
+
   const [experience, setExperience] = useState([
     {
       jobTitle: "",
@@ -35,6 +38,7 @@ function App() {
       description: "",
     },
   ]);
+
   const [projects, setProjects] = useState([
     {
       projectName: "",
@@ -42,6 +46,43 @@ function App() {
       projectDescription: "",
     },
   ]);
+
+  const previewRef = useRef();
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const handlePrint = () => {
+    const printContent = document.getElementById("resume-content");
+    if (!printContent) return;
+
+    const originalTitle = document.title;
+
+    document.title = generalInfo.name || "resume";
+
+    const style = document.createElement("style");
+    style.type = "text/css";
+    style.innerHTML = `
+      @media print {
+        body * {
+          visibility: hidden;
+        }
+        #resume-content, #resume-content * {
+          visibility: visible;
+        }
+        #resume-content {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 100%;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+
+    window.print();
+
+    document.head.removeChild(style);
+    document.title = originalTitle;
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
@@ -53,13 +94,29 @@ function App() {
           <Skills skills={skills} setSkills={setSkills} />
           <Experience experience={experience} setExperience={setExperience} />
           <Projects projects={projects} setProjects={setProjects} />
+
+          {/* PDF GENERATION BUTTONS */}
+          <div className="flex space-x-4">
+            <button
+              onClick={handlePrint}
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
+            >
+              Print / Save PDF
+            </button>
+          </div>
         </div>
 
         {/* Preview */}
-        <div className="w-1/2 p-6 bg-gray-50 rounded-lg border border-gray-200 overflow-auto max-h-[90vh]">
+        <div
+          ref={previewRef}
+          className="w-1/2 p-6 bg-gray-50 rounded-lg border border-gray-200 overflow-auto max-h-[90vh]"
+        >
           <h2 className="text-2xl font-semibold mb-4">Resume Preview</h2>
-          <div className="bg-white p-4 rounded-lg shadow-md">
-            <div className="text-gray-600 mb-8">
+          <div
+            id="resume-content"
+            className="bg-white p-4 rounded-lg shadow-md"
+          >
+            <div className="text-gray-600 mb-8 header">
               <h3 className="font-bold text-xl mb-2">
                 {generalInfo.name || "Your Name"}
               </h3>
@@ -85,7 +142,7 @@ function App() {
                 ))
               )}
             </div>
-            {/* Skills */}
+
             <div>
               <h3 className="font-semibold text-lg mb-2">Skills</h3>
               {skills.length === 0 ? (
@@ -103,7 +160,7 @@ function App() {
                 ))
               )}
             </div>
-            {/* Experience */}
+
             <div>
               <h3 className="font-semibold text-lg mb-2">Experience</h3>
               {experience.length === 0 ? (
@@ -126,10 +183,10 @@ function App() {
                 ))
               )}
             </div>
-            {/* Projects */}
+
             <div>
               <h3 className="font-semibold text-lg mb-2">Projects</h3>
-              {projects.length == 0 ? (
+              {projects.length === 0 ? (
                 <p className="italic text-gray-400">No projects added yet.</p>
               ) : (
                 projects.map((project, idx) => (
