@@ -3,6 +3,9 @@ import GeneralInfo from "./components/GeneralInfo";
 import Education from "./components/Education";
 import Experience from "./components/Experience";
 import Projects from "./components/Projects";
+import Skills from "./components/Skills";
+import "./App.css";
+import "./index.css";
 function App() {
   const [generalInfo, setGeneralInfo] = useState({
     name: "",
@@ -17,7 +20,12 @@ function App() {
       year: "",
     },
   ]);
-
+  const [skills, setSkills] = useState([
+    {
+      type: "",
+      list: "",
+    },
+  ]);
   const [experience, setExperience] = useState([
     {
       jobTitle: "",
@@ -42,6 +50,7 @@ function App() {
         <div className="w-1/2 space-y-8">
           <GeneralInfo info={generalInfo} setInfo={setGeneralInfo} />
           <Education education={education} setEducation={setEducation} />
+          <Skills skills={skills} setSkills={setSkills} />
           <Experience experience={experience} setExperience={setExperience} />
           <Projects projects={projects} setProjects={setProjects} />
         </div>
@@ -76,7 +85,25 @@ function App() {
                 ))
               )}
             </div>
-
+            {/* Skills */}
+            <div>
+              <h3 className="font-semibold text-lg mb-2">Skills</h3>
+              {skills.length === 0 ? (
+                <p className="italic text-gray-400">No skills added yet.</p>
+              ) : (
+                skills.map((skill, idx) => (
+                  <div key={idx} className="mb-2">
+                    <p>
+                      <span className="font-semibold">
+                        {skill.type || "Skill Type"}
+                      </span>{" "}
+                      - {skill.list || "Skill List"}
+                    </p>
+                  </div>
+                ))
+              )}
+            </div>
+            {/* Experience */}
             <div>
               <h3 className="font-semibold text-lg mb-2">Experience</h3>
               {experience.length === 0 ? (
